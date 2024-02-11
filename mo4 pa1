@@ -1,0 +1,51 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Stack;
+
+public class GroupingSymbolChecker {
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Usage: java GroupingSymbolChecker <filename>");
+            return;
+        }
+
+        String fileName = args[0];
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int lineNumber = 1;
+
+            Stack<Character> stack = new Stack<>();
+
+            while ((line = br.readLine()) != null) {
+                for (char c : line.toCharArray()) {
+                    if (c == '(' || c == '{' || c == '[') {
+                        stack.push(c);
+                    } else if (c == ')' || c == '}' || c == ']') {
+                        if (stack.isEmpty() || !isMatchingPair(stack.pop(), c)) {
+                            System.out.println("Error: Line " + lineNumber + " - Mismatched grouping symbol '" + c + "'");
+                            return;
+                        }
+                    }
+                }
+                lineNumber++;
+            }
+
+            if (!stack.isEmpty()) {
+                System.out.println("Error: Unmatched grouping symbols remain");
+            } else {
+                System.out.println("No errors found. Grouping symbols are correctly paired.");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+    }
+
+    private static boolean isMatchingPair(char opening, char closing) {
+        return (opening == '(' && closing == ')') ||
+               (opening == '{' && closing == '}') ||
+               (opening == '[' && closing == ']');
+    }
+}
